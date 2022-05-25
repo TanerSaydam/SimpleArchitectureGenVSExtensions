@@ -7,8 +7,8 @@
         <MoreInfo>https://www.tanersaydam.net</MoreInfo>
         <GettingStartedGuide>Simple Architecture Document.docx</GettingStartedGuide>
         <ReleaseNotes>V.1.0</ReleaseNotes>
-        <Icon>Resources\Icon.png</Icon>
-        <PreviewImage>Resources\Icon.png</PreviewImage>
+        <Icon>architechture.jpg</Icon>
+        <PreviewImage>architechture.jpg</PreviewImage>
         <Preview>true</Preview>
     </Metadata>
     <Installation>
