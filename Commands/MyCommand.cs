@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using System.IO;
 
 namespace SimpleArchitectureGen
 {
@@ -32,7 +32,8 @@ namespace SimpleArchitectureGen
                 "DbSet<" + selectedFileName + "> " + "\n" +
                 "I" + selectedFileName + "Service " + "\n" +
                 selectedFileName + "Manager " + "\n" +
-                selectedFileName + "Validator ";
+                selectedFileName + "Validator " + "\n" +
+                selectedFileName + "Messages ";
 
             if (!await VS.MessageBox.ShowConfirmAsync(selectedFileName + " entity için aşağıdaki dosyalar otomatik olarak oluşturulacaktır. Onaylıyor musunuz?", question))
             {
@@ -63,9 +64,17 @@ namespace SimpleArchitectureGen
 
             results = results + "\n" + "6) " + message;
 
-            message = ChangeBusinessDependencyResolversModule(path, selectedFileName);
+            message = CreateBusinessClassMessages(path, selectedFileName);
 
             results = results + "\n" + "7) " + message;
+
+            message = ChangeBusinessDependencyResolversModule(path, selectedFileName);
+
+            results = results + "\n" + "8) " + message;
+
+            message = CreateWebApiController(path, selectedFileName);
+
+            results = results + "\n" + "9) " + message;
 
             await VS.MessageBox.ShowAsync(results);
         }
@@ -113,15 +122,23 @@ namespace SimpleArchitectureGen
         {
             try
             {
+                string directoryPath = path;
                 int fileNameLength = selectedFileName.Length;
                 string className = selectedFileName.Substring(0, (fileNameLength - 3));
                 string fileName = "I" + className + "Dal";
-                string interfacePath = "DataAccess/Abstract";
+                string interfacePath = "DataAccess/Repositories/" + className + "Repository";
                 path = path + interfacePath + "/" + fileName + ".cs";
 
                 if (System.IO.File.Exists(path))
                 {
                     return fileName + " daha önceden oluşturulduğundan tekrar oluşturulmadı!";
+                }
+
+                directoryPath = directoryPath + interfacePath;
+                bool isDirectoryExtists = Directory.Exists(directoryPath);
+                if (!isDirectoryExtists)
+                {
+                    Directory.CreateDirectory(directoryPath);
                 }
 
                 interfacePath = interfacePath.Replace("/", ".");
@@ -158,10 +175,11 @@ namespace SimpleArchitectureGen
         {
             try
             {
+                string directoryPath = path;
                 int fileNameLength = selectedFileName.Length;
                 string className = selectedFileName.Substring(0, (fileNameLength - 3));
                 string fileName = "Ef" + className + "Dal";
-                string classPath = "DataAccess/Concrete/EntityFramework";
+                string classPath = "DataAccess/Repositories/" + className + "Repository";
                 path = path + classPath + "/" + fileName + ".cs";
 
                 if (System.IO.File.Exists(path))
@@ -169,6 +187,12 @@ namespace SimpleArchitectureGen
                     return fileName + " daha önceden oluşturulduğundan tekrar oluşturulmadı!";
                 }
 
+                directoryPath = directoryPath + classPath;
+                bool isDirectoryExtists = Directory.Exists(directoryPath);
+                if (!isDirectoryExtists)
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
 
                 classPath = classPath.Replace("/", ".");
 
@@ -181,12 +205,12 @@ namespace SimpleArchitectureGen
                     "using System.Threading.Tasks;",
                     "using Core.DataAccess.EntityFramework;",
                     "using Entities.Concrete;",
-                    "using DataAccess.Abstract;",
-                    "using DataAccess.Concrete.EntityFramework.Context;",
+                    "using DataAccess.Repositories." + className + "Repository;",
+                    "using DataAccess.Context.EntityFramework;",
                     "",
                     "namespace " + classPath,
                     "{",
-                    "    public class " + fileName + " : EfEntityRepositoryBase<" + className + ", SimpleContextDb> , I" + className + "Dal",
+                    "    public class " + fileName + " : EfEntityRepositoryBase<" + className + ", SimpleContextDb>, I" + className + "Dal",
                     "    {",
                     "    }",
                     "}"
@@ -206,7 +230,7 @@ namespace SimpleArchitectureGen
         {
             try
             {
-                path = path + "DataAccess/Concrete/EntityFramework/Context/SimpleContextDb.cs";
+                path = path + "DataAccess/Context/EntityFramework/SimpleContextDb.cs";
 
                 if (!System.IO.File.Exists(path))
                 {
@@ -215,8 +239,13 @@ namespace SimpleArchitectureGen
 
                 int fileNameLength = selectedFileName.Length;
                 string className = selectedFileName.Substring(0, (fileNameLength - 3));
+                string classDatabaseName = className + "s";
+                if (className.Substring((className.Length - 1), 1) == "s")
+                {
+                    classDatabaseName = className + "es";
+                }
 
-                string dbSet = "        public DbSet<" + className + "> " + className + "s { get; set; }";
+                string dbSet = "        public DbSet<" + className + ">? " + classDatabaseName + " { get; set; }";
 
                 var result = System.IO.File.ReadAllLines(path);
                 int resultLength = result.Length;
@@ -231,11 +260,13 @@ namespace SimpleArchitectureGen
                         isDbSetAdded = true;
                     }
 
-                    if (result[i].Contains("//Buraya dokunma"))
+                    if (result[i].Contains("{ get; set; }"))
                     {
                         replaceIndex = i;
                     }
                 }
+
+                replaceIndex = replaceIndex + 1;
 
                 if (isDbSetAdded)
                     return "Daha önce DbSet yapıldığı için tekrar yapılmadı!";
@@ -273,10 +304,12 @@ namespace SimpleArchitectureGen
         {
             try
             {
+                string directoryPath = path;
                 int fileNameLength = selectedFileName.Length;
                 string className = selectedFileName.Substring(0, (fileNameLength - 3));
+                string lowerClassName = className.Substring(0, 1).ToLower() + className.Substring(1);
                 string fileName = "I" + className + "Service";
-                string interfacePath = "Business/Abstract";
+                string interfacePath = "Business/Repositories/" + className + "Repository";
                 path = path + interfacePath + "/" + fileName + ".cs";
 
                 if (System.IO.File.Exists(path))
@@ -284,6 +317,12 @@ namespace SimpleArchitectureGen
                     return fileName + " daha önceden oluşturulduğundan tekrar oluşturulmadı!";
                 }
 
+                directoryPath = directoryPath + interfacePath;
+                bool isDirectoryExtists = Directory.Exists(directoryPath);
+                if (!isDirectoryExtists)
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
 
                 interfacePath = interfacePath.Replace("/", ".");
 
@@ -295,11 +334,17 @@ namespace SimpleArchitectureGen
                     "using System.Text;",
                     "using System.Threading.Tasks;",
                     "using Entities.Concrete;",
+                    "using Core.Utilities.Result.Abstract;",
                     "",
                     "namespace " + interfacePath,
                     "{",
                     "    public interface " + fileName,
                     "    {",
+                    "        IResult Add(" + className + " " + lowerClassName + ");",
+                    "        IResult Update(" + className + " " + lowerClassName + ");",
+                    "        IResult Delete(" + className + " " + lowerClassName + ");",
+                    "        IDataResult<List<" + className + ">> GetList();",
+                    "        IDataResult<" + className + "> GetById(int id);",
                     "    }",
                     "}"
                 };
@@ -318,15 +363,24 @@ namespace SimpleArchitectureGen
         {
             try
             {
+                string directoryPath = path;
                 int fileNameLength = selectedFileName.Length;
                 string className = selectedFileName.Substring(0, (fileNameLength - 3));
+                string lowerClassName = className.Substring(0, 1).ToLower() + className.Substring(1);
                 string fileName = className + "Manager";
-                string classPath = "Business/Concrete";
+                string classPath = "Business/Repositories/" + className + "Repository";
                 path = path + classPath + "/" + fileName + ".cs";
 
                 if (System.IO.File.Exists(path))
                 {
                     return fileName + " daha önceden oluşturulduğundan tekrar oluşturulmadı!";
+                }
+
+                directoryPath = directoryPath + classPath;
+                bool isDirectoryExtists = Directory.Exists(directoryPath);
+                if (!isDirectoryExtists)
+                {
+                    Directory.CreateDirectory(directoryPath);
                 }
 
                 classPath = classPath.Replace("/", ".");
@@ -342,9 +396,17 @@ namespace SimpleArchitectureGen
                     "using System.Linq;",
                     "using System.Text;",
                     "using System.Threading.Tasks;",
-                    "using Business.Abstract;",
+                    "using Business.Repositories." + className + "Repository;",
                     "using Entities.Concrete;",
-                    "using DataAccess.Abstract;",
+                    "using Business.Aspects.Secured;",
+                    "using Core.Aspects.Validation;",
+                    "using Core.Aspects.Caching;",
+                    "using Core.Aspects.Performance;",
+                    "using Business.Repositories." + className + "Repository.Validation.FluentValidation;",
+                    "using Business.Repositories." + className + "Repository.Constans;",
+                    "using Core.Utilities.Result.Abstract;",
+                    "using Core.Utilities.Result.Concrete;",
+                    "using DataAccess.Repositories." + className + "Repository;",
                     "",
                     "namespace " + classPath,
                     "{",
@@ -356,6 +418,48 @@ namespace SimpleArchitectureGen
                     "        {",
                     "            " + _className + " = " + classNameForConstructor + ";",
                     "        }",
+                    "",
+                    "        [SecuredAspect()]",
+                    "        [ValidationAspect(typeof(" + className +"Validator))]",
+                    @"        [RemoveCacheAspect(""I" + className + @"Service.Get"")]",
+                    "",
+                    "        public IResult Add(" + className + " " + lowerClassName + ")",
+                    "        {",
+                    "            _" + lowerClassName + "Dal.Add(" + lowerClassName + ");",
+                    "            return new SuccessResult(" + className + "Messages.Added);",
+                    "        }",
+                    "",
+                    "        [SecuredAspect()]",
+                    "        [ValidationAspect(typeof(" + className +"Validator))]",
+                    @"        [RemoveCacheAspect(""I" + className + @"Service.Get"")]",
+                    "",
+                    "        public IResult Update(" + className + " " + lowerClassName + ")",
+                    "        {",
+                    "            _" + lowerClassName + "Dal.Update(" + lowerClassName + ");",
+                    "            return new SuccessResult(" + className + "Messages.Updated);",
+                    "        }",
+                    "",
+                    "        [SecuredAspect()]",
+                    @"        [RemoveCacheAspect(""I" + className + @"Service.Get"")]",
+                    "",
+                    "        public IResult Delete(" + className + " " + lowerClassName + ")",
+                    "        {",
+                    "            _" + lowerClassName + "Dal.Delete(" + lowerClassName + ");",
+                    "            return new SuccessResult(" + className + "Messages.Deleted);",
+                    "        }",
+                    "",
+                    "        [CacheAspect()]",
+                    "        [PerformanceAspect()]",
+                    "        public IDataResult<List<" + className + ">> GetList()",
+                    "        {",
+                    "            return new SuccessDataResult<List<" + className +">>(_" + lowerClassName + "Dal.GetAll());",
+                    "        }",
+                    "",
+                    "        public IDataResult<" + className + "> GetById(int id)",
+                    "        {",
+                    "            return new SuccessDataResult<" + className +">(_" + lowerClassName + "Dal.Get(p => p.Id == id));",
+                    "        }",
+                    "",
                     "    }",
                     "}"
                 };
@@ -374,15 +478,23 @@ namespace SimpleArchitectureGen
         {
             try
             {
+                string directoryPath = path;
                 int fileNameLength = selectedFileName.Length;
                 string className = selectedFileName.Substring(0, (fileNameLength - 3));
                 string fileName = className + "Validator";
-                string classPath = "Business/ValidationRules/FluentValidation";
+                string classPath = "Business/Repositories/" + className + "Repository/Validation/FluentValidation";
                 path = path + classPath + "/" + fileName + ".cs";
 
                 if (System.IO.File.Exists(path))
                 {
                     return fileName + " daha önceden oluşturulduğundan tekrar oluşturulmadı!";
+                }
+
+                directoryPath = directoryPath + classPath;
+                bool isDirectoryExtists = Directory.Exists(directoryPath);
+                if (!isDirectoryExtists)
+                {
+                    Directory.CreateDirectory(directoryPath);
                 }
 
                 classPath = classPath.Replace("/", ".");
@@ -391,7 +503,7 @@ namespace SimpleArchitectureGen
                 {
                     "using System;",
                     "using System.Collections.Generic;",
-                    "using FluentValidation;;",
+                    "using FluentValidation;",
                     "using System.Text;",
                     "using System.Threading.Tasks;",
                     "using Entities.Concrete;",
@@ -417,6 +529,60 @@ namespace SimpleArchitectureGen
             }
         }
 
+        private static string CreateBusinessClassMessages(string path, string selectedFileName)
+        {
+            try
+            {
+                string directoryPath = path;
+                int fileNameLength = selectedFileName.Length;
+                string className = selectedFileName.Substring(0, (fileNameLength - 3));
+                string fileName = className + "Messages";
+                string classPath = "Business/Repositories/" + className + "Repository/Constans";
+                path = path + classPath + "/" + fileName + ".cs";
+
+                if (System.IO.File.Exists(path))
+                {
+                    return fileName + " daha önceden oluşturulduğundan tekrar oluşturulmadı!";
+                }
+
+                directoryPath = directoryPath + classPath;
+                bool isDirectoryExtists = Directory.Exists(directoryPath);
+                if (!isDirectoryExtists)
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
+                classPath = classPath.Replace("/", ".");
+
+                string[] contents =
+                {
+            "using System;",
+            "using System.Collections.Generic;",
+            "using FluentValidation;",
+            "using System.Text;",
+            "using System.Threading.Tasks;",
+            "",
+            "namespace " + classPath,
+            "{",
+            "    public class " + fileName,
+            "    {",
+            @"        public static string Added = ""Kayıt işlemi başarılı"";",
+            @"        public static string Updated = ""Güncelleme işlemi başarılı"";",
+            @"        public static string Deleted = ""Silme işlemi başarılı"";",
+            "    }",
+            "}"
+        };
+
+                System.IO.File.AppendAllLines(path, contents);
+                return fileName + " dosya başarıyla oluşturuldu"; ;
+            }
+            catch (Exception)
+            {
+                return "Business için Class Messages oluştururken bir hatayla karşılaştık!";
+                throw;
+            }
+        }
+
         private static string ChangeBusinessDependencyResolversModule(string path, string selectedFileName)
         {
             try
@@ -427,14 +593,6 @@ namespace SimpleArchitectureGen
                 {
                     return "AutofacBusinessModule bulunamadı! İşleme devam edilemiyor";
                 }
-
-                byte[] b = new byte[1024];
-                UTF8Encoding temp = new UTF8Encoding(true);
-
-                //while (System.IO.File.ReadAllText(b, 0, b.Length) > 0)
-                //{
-                //    Console.WriteLine(temp.GetString(b));
-                //}
 
                 int fileNameLength = selectedFileName.Length;
                 string className = selectedFileName.Substring(0, (fileNameLength - 3));
@@ -451,7 +609,9 @@ namespace SimpleArchitectureGen
                 bool addManager = true;
                 bool addDal = true;
                 int replaceIndex = 0;
-                int newResultLength = resultLength + 3;
+                int lastUsingIndex1 = 0;
+                int lastUsingIndex2 = 0;
+                int newResultLength = resultLength + 5;
                 for (int i = 0; i < resultLength; i++)
                 {
                     var isManagerExsist = result[i].Contains(managerName);
@@ -468,11 +628,21 @@ namespace SimpleArchitectureGen
                         newResultLength--;
                     }
 
-                    if (result[i].Contains("//Buraya dokunma"))
+                    if (result[i].Contains("var assembly ="))
                     {
                         replaceIndex = i;
                     }
+
+                    if (result[i].Contains("namespace Business"))
+                    {
+                        lastUsingIndex1 = i;
+                        lastUsingIndex2 = i;
+                    }
                 }
+
+                lastUsingIndex1 = lastUsingIndex1 - 1;
+                lastUsingIndex2 = lastUsingIndex2 - 2;
+                replaceIndex = replaceIndex + 2;
 
                 if (!addManager && !addDal)
                     return "Daha önce dependency injection yapıldığı için tekrar yapılmadı!";
@@ -481,8 +651,15 @@ namespace SimpleArchitectureGen
                 int count = 0;
                 for (int i = 0; i < (newResultLength); i++)
                 {
-
-                    if (i == replaceIndex && addManager)
+                    if (i == lastUsingIndex1 && addManager)
+                    {
+                        newResult[i] = "using DataAccess.Repositories." + className + "Repository;";
+                    }
+                    else if (i == lastUsingIndex2 && addManager)
+                    {
+                        newResult[i] = "using Business.Repositories." + className + "Repository;";
+                    }
+                    else if (i == replaceIndex && addManager)
                     {
                         newResult[i] = registerType1;
                     }
@@ -512,6 +689,120 @@ namespace SimpleArchitectureGen
                 throw;
             }
 
+        }
+
+        private static string CreateWebApiController(string path, string selectedFileName)
+        {
+            try
+            {
+                int fileNameLength = selectedFileName.Length;
+                string className = selectedFileName.Substring(0, (fileNameLength - 3));
+                string lowerClassName = className.Substring(0, 1).ToLower() + className.Substring(1);
+                string fileName = className + "Controller";
+                if (className.Substring((className.Length - 1), 1) == "s")
+                {
+                    fileName = className + "esController";
+                }
+                string classPath = "WebApi/Controllers";
+                path = path + classPath + "/" + fileName + ".cs";
+
+                if (System.IO.File.Exists(path))
+                {
+                    return fileName + " daha önceden oluşturulduğundan tekrar oluşturulmadı!";
+                }
+
+                classPath = classPath.Replace("/", ".");
+
+                string _className = "_" + className.Substring(0, 1).ToLower() + className.Substring(1, className.Length - 1) + "Service";
+
+                string classNameForConstructor = className.Substring(0, 1).ToLower() + className.Substring(1, className.Length - 1) + "Service";
+
+                string[] contents =
+                {
+                "using Business.Repositories.NewClassRepository;",
+                "using Entities.Concrete;",
+                "using Microsoft.AspNetCore.Mvc;",
+                "",
+                "namespace " + classPath,
+                "{",
+                @"    [Route(""api/[controller]"")]",
+                "    [ApiController]",
+                "    public class " + fileName + " : ControllerBase",
+                "    {",
+                "        private readonly I" + className + "Service " + _className + ";",
+                "",
+                "        public " + fileName + "(I" + className + "Service " + classNameForConstructor + ")",
+                "        {",
+                "            " + _className + " = " + classNameForConstructor + ";",
+                "        }",
+                "",
+                @"        [HttpPost(""add"")]",
+                "        public IActionResult Add(" + className + " " + lowerClassName + ")",
+                "        {",
+                "            var result = _" + lowerClassName + "Service.Add(" + lowerClassName + ");",
+                "            if (result.Success)",
+                "            {",
+                "                return Ok(result);",
+                "            }",
+                "            return BadRequest(result.Message);",
+                "        }",
+                "",
+                @"        [HttpPost(""update"")]",
+                "        public IActionResult Update(" + className + " " + lowerClassName + ")",
+                "        {",
+                "            var result = _" + lowerClassName + "Service.Update(" + lowerClassName + ");",
+                "            if (result.Success)",
+                "            {",
+                "                return Ok(result);",
+                "            }",
+                "            return BadRequest(result.Message);",
+                "        }",
+                "",
+                @"        [HttpPost(""delete"")]",
+                "        public IActionResult Delete(" + className + " " + lowerClassName + ")",
+                "        {",
+                "            var result = _" + lowerClassName + "Service.Delete(" + lowerClassName + ");",
+                "            if (result.Success)",
+                "            {",
+                "                return Ok(result);",
+                "            }",
+                "            return BadRequest(result.Message);",
+                "        }",
+                "",
+                @"        [HttpPost(""getList"")]",
+                "        public IActionResult GetList()",
+                "        {",
+                "            var result = _" + lowerClassName + "Service.GetList();",
+                "            if (result.Success)",
+                "            {",
+                "                return Ok(result);",
+                "            }",
+                "            return BadRequest(result.Message);",
+                "        }",
+                "",
+                @"        [HttpPost(""getById"")]",
+                "        public IActionResult GetById(int id)",
+                "        {",
+                "            var result = _" + lowerClassName + "Service.GetById(id);",
+                "            if (result.Success)",
+                "            {",
+                "                return Ok(result);",
+                "            }",
+                "            return BadRequest(result.Message);",
+                "        }",
+                "",
+                "    }",
+                "}"
+            };
+
+                System.IO.File.AppendAllLines(path, contents);
+                return fileName + " dosya başarıyla oluşturuldu";
+            }
+            catch (Exception)
+            {
+                return "WebApi için Controller oluştururken bir hatayla karşılaştık!";
+                throw;
+            }
         }
     }
 }
