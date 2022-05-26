@@ -403,7 +403,7 @@ namespace SimpleArchitectureGen
                     "using Core.Aspects.Caching;",
                     "using Core.Aspects.Performance;",
                     "using Business.Repositories." + className + "Repository.Validation.FluentValidation;",
-                    "using Business.Repositories." + className + "Repository.Constans;",
+                    "using Business.Repositories." + className + "Repository.Constants;",
                     "using Core.Utilities.Result.Abstract;",
                     "using Core.Utilities.Result.Concrete;",
                     "using DataAccess.Repositories." + className + "Repository;",
@@ -537,7 +537,7 @@ namespace SimpleArchitectureGen
                 int fileNameLength = selectedFileName.Length;
                 string className = selectedFileName.Substring(0, (fileNameLength - 3));
                 string fileName = className + "Messages";
-                string classPath = "Business/Repositories/" + className + "Repository/Constans";
+                string classPath = "Business/Repositories/" + className + "Repository/Constants";
                 path = path + classPath + "/" + fileName + ".cs";
 
                 if (System.IO.File.Exists(path))

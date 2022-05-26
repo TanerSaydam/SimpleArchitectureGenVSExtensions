@@ -6,7 +6,7 @@
         <Description xml:space="preserve">This is code generator for SimpleArchitecture</Description>
         <MoreInfo>https://www.tanersaydam.net</MoreInfo>
         <GettingStartedGuide>Simple Architecture Document.docx</GettingStartedGuide>
-        <ReleaseNotes>V.1.0</ReleaseNotes>
+        <ReleaseNotes>V.1.1 Reelase Notes: . Constans folder name changed to Constants</ReleaseNotes>
         <Icon>3131473.jpg</Icon>
         <PreviewImage>3131473.jpg</PreviewImage>
         <Preview>true</Preview>
