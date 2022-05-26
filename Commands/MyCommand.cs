@@ -402,7 +402,7 @@ namespace SimpleArchitectureGen
                     "using Core.Aspects.Validation;",
                     "using Core.Aspects.Caching;",
                     "using Core.Aspects.Performance;",
-                    "using Business.Repositories." + className + "Repository.Validation.FluentValidation;",
+                    "using Business.Repositories." + className + "Repository.Validation;",
                     "using Business.Repositories." + className + "Repository.Constants;",
                     "using Core.Utilities.Result.Abstract;",
                     "using Core.Utilities.Result.Concrete;",
@@ -482,7 +482,7 @@ namespace SimpleArchitectureGen
                 int fileNameLength = selectedFileName.Length;
                 string className = selectedFileName.Substring(0, (fileNameLength - 3));
                 string fileName = className + "Validator";
-                string classPath = "Business/Repositories/" + className + "Repository/Validation/FluentValidation";
+                string classPath = "Business/Repositories/" + className + "Repository/Validation";
                 path = path + classPath + "/" + fileName + ".cs";
 
                 if (System.IO.File.Exists(path))
