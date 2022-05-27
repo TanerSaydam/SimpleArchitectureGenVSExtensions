@@ -8,7 +8,7 @@ namespace SimpleArchitectureGen
     internal sealed partial class Vsix
     {
         public const string Id = "SimpleArchitectureGenv1.af0b02be-d43b-45d1-ba43-7d214dd9c2bf";
-        public const string Name = "Simple Architecture Code Generator V.1.1";
+        public const string Name = "Simple Architecture Code Generator V.1.2";
         public const string Description = @"This is code generator for SimpleArchitecture";
         public const string Language = "en-US";
         public const string Version = "1.0";

@@ -719,7 +719,7 @@ namespace SimpleArchitectureGen
 
                 string[] contents =
                 {
-                "using Business.Repositories.NewClassRepository;",
+                "using Business.Repositories." + className + "Repository;",
                 "using Entities.Concrete;",
                 "using Microsoft.AspNetCore.Mvc;",
                 "",
