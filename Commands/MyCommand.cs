@@ -244,6 +244,10 @@ namespace SimpleArchitectureGen
                 {
                     classDatabaseName = className + "es";
                 }
+                if (className.Substring((className.Length - 1), 1) == "y")
+                {
+                    classDatabaseName = className.Substring(0, (className.Length - 1)) + "ies";
+                }
 
                 string dbSet = "        public DbSet<" + className + ">? " + classDatabaseName + " { get; set; }";
 
@@ -704,6 +708,10 @@ namespace SimpleArchitectureGen
                 if (className.Substring((className.Length - 1), 1) == "s")
                 {
                     fileName = className + "esController";
+                }
+                if (className.Substring((className.Length - 1), 1) == "y")
+                {
+                    fileName = className.Substring(0, (className.Length - 1)) + "iesController";
                 }
 
                 string classPath = "WebApi/Controllers";
