@@ -539,7 +539,7 @@ namespace SimpleArchitectureGen
                 int fileNameLength = selectedFileName.Length;
                 string className = selectedFileName.Substring(0, (fileNameLength - 3));
                 string fileName = className + "Messages";
-                string classPath = "Business/Repositories/" + className + "/Constants";
+                string classPath = "Business/Repositories/" + className + "Repository/Constants";
                 path = path + classPath + "/" + fileName + ".cs";
 
                 if (System.IO.File.Exists(path))
@@ -700,11 +700,12 @@ namespace SimpleArchitectureGen
                 int fileNameLength = selectedFileName.Length;
                 string className = selectedFileName.Substring(0, (fileNameLength - 3));
                 string lowerClassName = className.Substring(0, 1).ToLower() + className.Substring(1);
-                string fileName = className + "Controller";
+                string fileName = className + "s" + "Controller";
                 if (className.Substring((className.Length - 1), 1) == "s")
                 {
                     fileName = className + "esController";
                 }
+
                 string classPath = "WebApi/Controllers";
                 path = path + classPath + "/" + fileName + ".cs";
 
