@@ -402,8 +402,8 @@ namespace SimpleArchitectureGen
                     "using Core.Aspects.Validation;",
                     "using Core.Aspects.Caching;",
                     "using Core.Aspects.Performance;",
-                    "using Business.Repositories." + className + "Repository.Validation;",
-                    "using Business.Repositories." + className + "Repository.Constants;",
+                    "using Business.Repositories." + className + ".Validation;",
+                    "using Business.Repositories." + className + ".Constants;",
                     "using Core.Utilities.Result.Abstract;",
                     "using Core.Utilities.Result.Concrete;",
                     "using DataAccess.Repositories." + className + "Repository;",
@@ -537,7 +537,7 @@ namespace SimpleArchitectureGen
                 int fileNameLength = selectedFileName.Length;
                 string className = selectedFileName.Substring(0, (fileNameLength - 3));
                 string fileName = className + "Messages";
-                string classPath = "Business/Repositories/" + className + "Repository/Constants";
+                string classPath = "Business/Repositories/" + className + "/Constants";
                 path = path + classPath + "/" + fileName + ".cs";
 
                 if (System.IO.File.Exists(path))
@@ -769,7 +769,7 @@ namespace SimpleArchitectureGen
                 "            return BadRequest(result.Message);",
                 "        }",
                 "",
-                @"        [HttpPost(""getList"")]",
+                @"        [HttpGet(""getList"")]",
                 "        public IActionResult GetList()",
                 "        {",
                 "            var result = _" + lowerClassName + "Service.GetList();",
@@ -780,7 +780,7 @@ namespace SimpleArchitectureGen
                 "            return BadRequest(result.Message);",
                 "        }",
                 "",
-                @"        [HttpPost(""getById"")]",
+                @"        [HttpGet(""getById"")]",
                 "        public IActionResult GetById(int id)",
                 "        {",
                 "            var result = _" + lowerClassName + "Service.GetById(id);",

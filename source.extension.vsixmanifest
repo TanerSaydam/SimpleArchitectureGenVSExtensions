@@ -2,11 +2,11 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
         <Identity Id="SimpleArchitectureGenv1.af0b02be-d43b-45d1-ba43-7d214dd9c2bf" Version="1.0" Language="en-US" Publisher="Taner Saydam" />
-        <DisplayName>Simple Architecture Code Generator V.1.2</DisplayName>
-        <Description xml:space="preserve">This is code generator for SimpleArchitecture</Description>
+        <DisplayName>Simple Architecture Code Generator V.1.3</DisplayName>
+        <Description xml:space="preserve">This is code generator for SimpleArchitecture V.1.3</Description>
         <MoreInfo>https://www.tanersaydam.net</MoreInfo>
-        <GettingStartedGuide>Simple Architecture Code Generator Document.docx</GettingStartedGuide>
-        <ReleaseNotes>ReleaseNotes.rtf</ReleaseNotes>
+        <GettingStartedGuide>Code Generator Release Notes.rtf</GettingStartedGuide>
+        <ReleaseNotes>Code Generator Release Notes.rtf</ReleaseNotes>
         <Icon>3131473.jpg</Icon>
         <PreviewImage>3131473.jpg</PreviewImage>
         <Preview>true</Preview>
