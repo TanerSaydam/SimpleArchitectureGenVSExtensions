@@ -258,7 +258,7 @@ namespace SimpleArchitectureGen
                 bool isEFConfigurationAdded = false;
                 int replaceIndex = 0;
                 int entityConfigurationIndex = 0;
-                int newResultLength = resultLength + 1;
+                int newResultLength = resultLength + 2;
                 for (int i = 0; i < resultLength; i++)
                 {
                     var isDbSetExsist = result[i].Contains(dbSet);
