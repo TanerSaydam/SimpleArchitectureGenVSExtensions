@@ -249,16 +249,19 @@ namespace SimpleArchitectureGen
                     classDatabaseName = className.Substring(0, (className.Length - 1)) + "ies";
                 }
 
-                string dbSet = "        public DbSet<" + className + ">? " + classDatabaseName + " { get; set; }";
+                string dbSet = "        public DbSet<" + className + "> " + classDatabaseName + " { get; set; }";
+                string efConfiguration = "            modelBuilder.ApplyConfigurationsFromAssembly(typeof(" + className + "Configuration).Assembly);";
 
                 var result = System.IO.File.ReadAllLines(path);
                 int resultLength = result.Length;
                 bool isDbSetAdded = false;
+                bool isEFConfigurationAdded = false;
                 int replaceIndex = 0;
+                int entityConfigurationIndex = 0;
                 int newResultLength = resultLength + 1;
                 for (int i = 0; i < resultLength; i++)
                 {
-                    var isDbSetExsist = result[i].Contains(className);
+                    var isDbSetExsist = result[i].Contains(dbSet);
                     if (isDbSetExsist)
                     {
                         isDbSetAdded = true;
@@ -267,6 +270,15 @@ namespace SimpleArchitectureGen
                     if (result[i].Contains("{ get; set; }"))
                     {
                         replaceIndex = i;
+                    }
+
+                    if (result[i].Contains("modelBuilder.ApplyConfigurationsFromAssembly"))
+                    {
+                        if (result[i].Contains(efConfiguration))
+                        {
+                            isEFConfigurationAdded = true;
+                        }
+                        entityConfigurationIndex = i;
                     }
                 }
 
@@ -280,15 +292,25 @@ namespace SimpleArchitectureGen
                 for (int i = 0; i < (newResultLength); i++)
                 {
 
+                    if (entityConfigurationIndex > 0)
+                    {
+                        if ((entityConfigurationIndex + 2) == i && isEFConfigurationAdded == false)
+                        {
+                            newResult[i] = efConfiguration;
+                            goto next;
+                        }
+                    }
+
                     if (i == replaceIndex && !isDbSetAdded)
                     {
                         newResult[i] = dbSet;
-                    }
+                    }                    
                     else
                     {
                         newResult[i] = result[count];
                         count++;
                     }
+                next:;
                 }
 
                 System.IO.File.Delete(path);
@@ -620,14 +642,14 @@ namespace SimpleArchitectureGen
                 int newResultLength = resultLength + 5;
                 for (int i = 0; i < resultLength; i++)
                 {
-                    var isManagerExsist = result[i].Contains(managerName);
+                    var isManagerExsist = result[i].Contains(registerType1);
                     if (isManagerExsist)
                     {
                         addManager = false;
                         newResultLength--;
                     }
 
-                    var isDalExsist = result[i].Contains(classDal);
+                    var isDalExsist = result[i].Contains(registerType2);
                     if (isDalExsist)
                     {
                         addDal = false;
